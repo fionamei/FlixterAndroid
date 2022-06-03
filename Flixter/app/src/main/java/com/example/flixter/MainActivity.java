@@ -16,14 +16,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.font.NumericShaper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Headers;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=12393c8c10e424175b37702213cde5dc";
+    public static final String API_KEY = BuildConfig.MOVIEDB_APIKEY;
+    public static final String NOW_PLAYING_URL = String.format("https://api.themoviedb.org/3/movie/now_playing?api_key=%s", API_KEY);
     public static final String TAG = "MainActivity";
 
     List<Movie> movies;

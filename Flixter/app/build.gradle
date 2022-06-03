@@ -2,6 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
+
 android {
     compileSdk 32
 
@@ -13,6 +18,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // should correspond to key/value pairs inside the file
+        buildConfigField("String", "MOVIEDB_APIKEY", apikeyProperties['MOVIEDB_APIKEY'])
+        buildConfigField("String", "GOOGLE_APIKEY", apikeyProperties['GOOGLE_APIKEY'])
     }
 
     buildTypes {
@@ -25,10 +34,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
     implementation 'org.parceler:parceler-api:1.1.12'
+    implementation files('libs/YouTubeAndroidPlayerApi.jar')
     annotationProcessor 'org.parceler:parceler:1.1.12'
 
     implementation 'com.codepath.libraries:asynchttpclient:2.2.0'
