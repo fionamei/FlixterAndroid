@@ -24,12 +24,11 @@ import java.util.Locale;
 import okhttp3.Headers;
 
 public class MainActivity extends AppCompatActivity {
-
-    public static final String API_KEY = BuildConfig.MOVIEDB_APIKEY;
-    public static final String NOW_PLAYING_URL = String.format("https://api.themoviedb.org/3/movie/now_playing?api_key=%s", API_KEY);
     public static final String TAG = "MainActivity";
 
     List<Movie> movies;
+    MovieClient client;
+    MovieAdapter movieAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,39 +37,38 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView rvMovies = findViewById(R.id.rvMovies);
         movies = new ArrayList<>();
         //create an adapter
-        final MovieAdapter movieAdapter = new MovieAdapter(this, movies);
+        movieAdapter = new MovieAdapter(this, movies);
+        client = new MovieClient();
 
         //set the adapter on the recycler view
         rvMovies.setAdapter(movieAdapter);
 
         //set a layout manager on the recycler view
         rvMovies.setLayoutManager(new LinearLayoutManager(this));
+        setMovies();
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
+    }
+
+    public void setMovies() {
+        client.getMovies(new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
-                Log.d(TAG, "onSucess");
                 JSONObject jsonObject = json.jsonObject;
                 try {// key may not exist ! so u need to try catch :DD
                     JSONArray results = jsonObject.getJSONArray("results");
-                    Log.i(TAG, "Results:" + results.toString());
                     movies.addAll(Movie.fromJsonArray(results));
                     movieAdapter.notifyDataSetChanged();
-                    Log.i(TAG, "Movies:" + movies.size());
 
                 } catch (JSONException e) {
                     Log.e(TAG, "Hit json exception", e);
-//                    e.printStackTrace();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.d(TAG, "onFailure");
+//
             }
         });
-
-
     }
 }

@@ -25,6 +25,8 @@ public class MovieTrailerActivity extends YouTubeBaseActivity {
     public static final String YOUTUBEKEY = BuildConfig.GOOGLE_APIKEY;
     public static final String API_KEY = BuildConfig.MOVIEDB_APIKEY;
     public static final String MOVIE_API = String.format("https://api.themoviedb.org/3/movie/338953/videos?api_key=%s", API_KEY);
+    public static final String id = "338953";
+    MovieClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,31 +34,10 @@ public class MovieTrailerActivity extends YouTubeBaseActivity {
         setContentView(R.layout.activity_movie_trailer);
 
         YouTubePlayerView playerView = (YouTubePlayerView) findViewById(R.id.player);
+        String videoID = getIntent().getStringExtra("videoID");
+        Log.i(TAG, "test is " + videoID);
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(MOVIE_API, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON json) {
-                Log.d(TAG, "onSucess");
-                JSONObject jsonObject = json.jsonObject;
-
-                JSONArray results = null;
-                try {
-                    results = jsonObject.getJSONArray("results"); // need trycatch bc it might not be a jsonarray
-                    JSONObject firstObject = (JSONObject) results.get(0);
-                    String movieID = firstObject.getString("key");
-                    initializeYoutubePlayer(movieID, playerView);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                Log.d(TAG, "onFailure");
-            }
-        });
+        initializeYoutubePlayer(videoID, playerView);
     }
 
     private void initializeYoutubePlayer(String videoId, YouTubePlayerView playerView) {
@@ -76,5 +57,6 @@ public class MovieTrailerActivity extends YouTubeBaseActivity {
             }
         });
     }
+
 
 }

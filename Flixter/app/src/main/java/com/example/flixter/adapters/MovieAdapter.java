@@ -39,7 +39,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        Log.d("MovieAdapter", "onCreateViewHolder");
         View movieView = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
         return new ViewHolder(movieView);
     }
@@ -47,10 +46,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     // involves populating data into item through holder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-//        Log.d("MovieAdapter", "onBindViewHolder" + position);
-        //get the movie position
         Movie movie = movies.get(position);
-        //bind the movie data into the viewholder
         holder.bind(movie);
     }
 
@@ -78,8 +74,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             tvTitle.setText(movie.getTitle());
             tvOverview.setText(movie.getOverview());
             String imageUrl;
-            // if phone in landscape, imageurl = backdropimage,
-            // else, imageurl = posterimage
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 imageUrl = movie.getBackdropPath();
             } else {
@@ -87,11 +81,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             }
 
             int radius = 30;
-            //use library to render images
             Glide.with(context)
                     .load(imageUrl)
                     .placeholder(R.drawable.flicks_movie_placeholder)
-//                    .apply(RequestOptions.bitmapTransform(new RoundedCorners(radius)))
                     .centerCrop()
                     .transform(new RoundedCorners(radius))
                     .into(ivPoster);
@@ -101,13 +93,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         public void onClick(View v) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                //getgs movie at position
                 Movie movie = movies.get(position);
-                //creates intent for new activity
                 Intent intent = new Intent(context, MovieDetailsActivity.class);
-                //serialize movie using parceler use short name as key
                 intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
-                //show activity
                 context.startActivity(intent);
             }
         }

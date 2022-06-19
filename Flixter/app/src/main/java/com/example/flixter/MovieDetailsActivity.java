@@ -15,9 +15,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.example.flixter.models.Movie;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.parceler.Parcels;
+
+import okhttp3.Headers;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
@@ -27,8 +33,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
     TextView tvOverview;
     RatingBar rbVoteAverage;
     ImageView ivPoster;
+    MovieClient client;
 
     Context context;
+
+    String videoID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +48,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         tvOverview = (TextView) findViewById(R.id.tvOverview);
         rbVoteAverage = (RatingBar) findViewById(R.id.rbVoteAverage);
         ivPoster = (ImageView) findViewById(R.id.ivPoster);
+        client = new MovieClient();
 
-        context = this;
         //unwrap movie passined in via intent, using simple name as key
         movie = (Movie) Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
         Log.d("MovieDetailsActivity", String.format("showing details for '%s'", movie.getTitle()));
 
         tvTitle.setText(movie.getTitle());
         tvOverview.setText(movie.getOverview());
+        context = this;
 
         String imageUrl = movie.getBackdropPath();
         Glide.with(this)
@@ -64,16 +74,30 @@ public class MovieDetailsActivity extends AppCompatActivity {
         ivPoster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                String videoId = MovieTrailerActivity.getVideoId();
-                String videoId =  "tKodtNFpzBA";
-                if (videoId != "") {
-                    Intent intent = new Intent(context, MovieTrailerActivity.class);
-                    context.startActivity(intent);
-                }
+
+                client.getMovieID(movie.getId().toString(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Headers headers, JSON json) {
+                        JSONArray results = null; // need trycatch bc it might not be a jsonarray
+                        try {
+                            results = json.jsonObject.getJSONArray("results");
+                            JSONObject firstObject = (JSONObject) results.get(0);
+                            videoID = firstObject.getString("key");
+                            Intent intent = new Intent(context, MovieTrailerActivity.class);
+                            intent.putExtra("videoID", videoID);
+                            context.startActivity(intent);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                        Log.e("moviedetail", throwable.toString());
+                    }
+                });
             }
         });
     }
-
-
 
 }
