@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.codepath.asynchttpclient.AsyncHttpClient;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.example.flixter.adapters.MovieAdapter;
 import com.example.flixter.models.Movie;
@@ -16,10 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.awt.font.NumericShaper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import okhttp3.Headers;
 
@@ -34,19 +31,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RecyclerView rvMovies = findViewById(R.id.rvMovies);
+
         movies = new ArrayList<>();
-        //create an adapter
         movieAdapter = new MovieAdapter(this, movies);
         client = new MovieClient();
 
-        //set the adapter on the recycler view
-        rvMovies.setAdapter(movieAdapter);
+        RecyclerView rvMovies = findViewById(R.id.rvMovies);
+        populateViews(rvMovies);
 
-        //set a layout manager on the recycler view
+    }
+
+    private void populateViews(RecyclerView rvMovies) {
+        rvMovies.setAdapter(movieAdapter);
         rvMovies.setLayoutManager(new LinearLayoutManager(this));
         setMovies();
-
     }
 
     public void setMovies() {

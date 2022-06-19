@@ -1,11 +1,9 @@
 package com.example.flixter;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,15 +26,12 @@ import okhttp3.Headers;
 public class MovieDetailsActivity extends AppCompatActivity {
 
     Movie movie;
-
     TextView tvTitle;
     TextView tvOverview;
     RatingBar rbVoteAverage;
     ImageView ivPoster;
     MovieClient client;
-
     Context context;
-
     String videoID;
 
     @Override
@@ -44,20 +39,26 @@ public class MovieDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
         //resolve the view objects
+
+        client = new MovieClient();
+        context = this;
+        movie = (Movie) Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
+
+        initViews();
+        populateViews();
+        listenerSetup();
+    }
+
+    private void initViews() {
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvOverview = (TextView) findViewById(R.id.tvOverview);
         rbVoteAverage = (RatingBar) findViewById(R.id.rbVoteAverage);
         ivPoster = (ImageView) findViewById(R.id.ivPoster);
-        client = new MovieClient();
+    }
 
-        //unwrap movie passined in via intent, using simple name as key
-        movie = (Movie) Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
-        Log.d("MovieDetailsActivity", String.format("showing details for '%s'", movie.getTitle()));
-
+    private void populateViews() {
         tvTitle.setText(movie.getTitle());
         tvOverview.setText(movie.getOverview());
-        context = this;
-
         String imageUrl = movie.getBackdropPath();
         Glide.with(this)
                 .load(imageUrl)
@@ -69,7 +70,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         float voteAverage = movie.getVoteAverage().floatValue();
         rbVoteAverage.setRating(voteAverage / 2.0f);
+    }
 
+    private void listenerSetup() {
         ivPoster.setClickable(true);
         ivPoster.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +81,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 client.getMovieID(movie.getId().toString(), new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        JSONArray results = null; // need trycatch bc it might not be a jsonarray
+                        JSONArray results; // need trycatch bc it might not be a jsonarray
                         try {
                             results = json.jsonObject.getJSONArray("results");
                             JSONObject firstObject = (JSONObject) results.get(0);

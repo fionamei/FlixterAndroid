@@ -8,8 +8,6 @@ import org.parceler.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @Parcel
 public class Movie {
 
