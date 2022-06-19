@@ -6,10 +6,10 @@
     android:layout_height="match_parent">
 
     <com.google.android.youtube.player.YouTubePlayerView
-        android:id="@+id/ytVideo"
+        android:id="@+id/player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
